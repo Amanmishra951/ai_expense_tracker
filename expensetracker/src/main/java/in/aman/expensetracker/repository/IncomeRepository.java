@@ -41,4 +41,3 @@ public interface IncomeRepository extends JpaRepository<IncomeEntity, Long> {
             LocalDate endDate
     );
 }
-

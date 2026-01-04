@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,12 +24,30 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
+    // ✅ ADD ONLY THIS (CHATBOT + PUBLIC APIS)
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/login",
+            "/register",
+            "/status",
+            "/health",
+            "/activate",
+            "/chat"   // ✅ CHATBOT BYPASS
+    );
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+
+        String requestPath = request.getRequestURI();
+
+        // ✅ SKIP JWT FILTER FOR CHAT & PUBLIC ENDPOINTS
+        if (EXCLUDED_PATHS.stream().anyMatch(requestPath::contains)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
 
@@ -53,7 +72,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                 userDetails.getAuthorities()
                         );
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

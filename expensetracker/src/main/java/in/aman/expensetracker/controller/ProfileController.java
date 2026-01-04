@@ -22,38 +22,22 @@ public class ProfileController {
         ProfileDTO registeredProfile = profileService.registerProfile(profileDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredProfile);
 
-}
-/*@RestController
-@RequiredArgsConstructor
-public class ProfileController {
-
-    private final ProfileService profileService;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody ProfileDTO profileDTO) {
-        try {
-            ProfileDTO registeredProfile = profileService.registerProfile(profileDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(registeredProfile);
-        } catch (RuntimeException ex) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(ex.getMessage());
-        }
-    }*/
-@GetMapping("/activate")
-public ResponseEntity<String> activateProfile(
-        @RequestParam("token") String activationToken) {
-
-    boolean isActivated = profileService.activateProfile(activationToken);
-
-    if (isActivated) {
-        return ResponseEntity.ok("Profile activated successfully");
-    } else {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("Activation token not found or already used");
     }
-}
+
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateProfile(
+            @RequestParam("token") String activationToken) {
+
+        boolean isActivated = profileService.activateProfile(activationToken);
+
+        if (isActivated) {
+            return ResponseEntity.ok("Profile activated successfully");
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Activation token not found or already used");
+        }
+    }
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody AuthDTO authDTO) {
         try {
@@ -80,6 +64,13 @@ public ResponseEntity<String> activateProfile(
                     ));
         }
     }
+
+    @GetMapping ("/profile")
+    public ResponseEntity<ProfileDTO> getPublicProfile(){
+        ProfileDTO profileDTO=profileService.getPublicProfile(null);
+        return ResponseEntity.ok(profileDTO);
+    }
+
 
 }
 

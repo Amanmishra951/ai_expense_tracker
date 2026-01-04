@@ -1,6 +1,5 @@
 package in.aman.expensetracker.config;
 
-
 import in.aman.expensetracker.security.JwtRequestFilter;
 import in.aman.expensetracker.service.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +41,17 @@ public class SecurityConfig {
                                 "/health",
                                 "/register",
                                 "/activate",
-                                "/login"
+                                "/login",
+
+                                // ✅ CHATBOT FIX (IMPORTANT)
+                                "/chat"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
@@ -75,11 +79,11 @@ public class SecurityConfig {
 
         return source;
     }
+
     @Bean
     public AuthenticationManager authenticationManager() {
 
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-
         authenticationProvider.setUserDetailsService(appUserDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
